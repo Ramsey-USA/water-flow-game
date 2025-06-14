@@ -3,7 +3,7 @@ html, body {
     padding: 0;
     height: 100%;
     width: 100%;
-    font-family: Arial, sans-serif;
+    font-family: 'Baloo 2', cursive;
     background: #f0f8ff;
 }
 
@@ -40,7 +40,7 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     transition: bottom 0.2s cubic-bezier(.4,2,.6,1);
     outline: none;
-    background: url('../assets/player.png') center/contain no-repeat, #ffcc00;
+    background: url('../assets/player_sprite.png') center/contain no-repeat, #ffcc00;
 }
 
 /* For jump animation - JS will toggle a class */
@@ -58,7 +58,7 @@ body {
 .obstacle {
     width: 40px;
     height: 60px;
-    background: url('../assets/obstacle.png') center/contain no-repeat, #a0522d;
+    background: url('../assets/thorny_bush.png') center/contain no-repeat, #a0522d;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(160,82,45,0.2);
 }
@@ -91,15 +91,16 @@ body {
 }
 
 #message-overlay, #game-over-overlay {
-    position: absolute;
+    position: fixed; /* Changed from absolute to fixed */
     top: 0; left: 0;
-    width: 100%; height: 100%;
+    width: 100vw; height: 100vh; /* Ensure full viewport coverage */
     background: rgba(0,0,0,0.7);
     color: #222;
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 100;
+    z-index: 1000; /* Increased z-index for visibility */
+    pointer-events: all;
 }
 
 #message-content, #game-over-content {
@@ -109,6 +110,12 @@ body {
     box-shadow: 0 0 24px rgba(0,0,0,0.2);
     color: #333;
     max-width: 350px;
+    font-family: 'Segoe UI', 'Roboto', 'Arial Rounded MT Bold', Arial, sans-serif;
+    letter-spacing: 0.02em;
+    text-align: center; /* Center the content */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 #message-content h2, #game-over-content h2 {
@@ -139,6 +146,22 @@ body {
 
 #start-button:hover, #restart-button:hover {
     background: #1a5b9b;
+}
+
+#ground {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 80px;
+    background: url('../assets/ground_texture.png') repeat-x center/cover;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Ensure player and obstacles are above the ground */
+#player, .obstacle, .collectible {
+    z-index: 2;
 }
 
 @media (max-width: 900px) {
