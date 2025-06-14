@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=800, initial-scale=1.0">
+    <title>Journey for Every Drop - Clean Water Runner</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="player" tabindex="0" aria-label="Player"></div>
+        <div id="score">Score: 0</div>
+        <div id="message-overlay" class="hidden">
+            <div id="message-content">
+                <h2>Journey for Every Drop</h2>
+                <p>Tap or click to jump and collect clean water!</p>
+                <button id="start-button" autofocus>Start Game</button>
+            </div>
+        </div>
+        <div id="game-over-overlay" class="hidden">
+            <div id="game-over-content">
+                <h2>Game Over!</h2>
+                <p>You delivered <span id="final-score">0</span> drops of clean water!</p>
+                <p>Every drop makes a difference. Learn more about <a href="https://www.charitywater.org" target="_blank" rel="noopener">charity: water's mission</a>.</p>
+                <button id="restart-button">Play Again</button>
+            </div>
+        </div>
+    </div>
+    <script src="js/app.js"></script>
+</body>
+</html>
