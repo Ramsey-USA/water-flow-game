@@ -14,16 +14,20 @@ let score = 0;
 let playerBottom = 80;
 let playerLeft = 50;
 let isJumping = false;
-let gameSpeed = 3;
+let gameSpeed = 3; // initial speed
 let obstacleInterval;
 let collectibleInterval;
 let gameLoopId;
 let jumpForce = 8;
-let gravity = 0.5;
+let gravity = 0.3;
 let jumpHeld = false;
 let jumpStart = false;
 let jumpPeak = 200; // max jump height
-let jumpSpeed = 6;  // how fast to rise
+let jumpSpeed = 5;  // how fast to rise
+let lastObstacleTime = 0;
+let lastSpeedIncreaseScore = 0; // Track last score at which speed increased
+const minObstacleInterval = 900;   // Minimum ms between obstacles
+const maxObstacleInterval = 1600;  // Maximum ms between obstacles
 
 // --- Game Initialization and Control ---
 
@@ -160,12 +164,39 @@ function endGame() {
 
 // --- Obstacle & Collectible Generation ---
 
+function scheduleNextObstacle() {
+    if (!gameRunning) return;
+    // Randomize the next gap, but always enforce a minimum
+    const nextGap = Math.random() * (maxObstacleInterval - minObstacleInterval) + minObstacleInterval;
+    setTimeout(() => {
+        generateObstacle();
+        scheduleNextObstacle();
+    }, nextGap);
+}
+
 function generateObstacle() {
     if (!gameRunning) return;
+    const now = Date.now();
+    if (now - lastObstacleTime < minObstacleInterval) return;
+    lastObstacleTime = now;
+
+    // Randomly choose obstacle type: bush or pipe
+    const obstacleType = Math.random() < 0.7 ? 'bush' : 'pipe'; // 70% bush, 30% pipe
     const obstacle = document.createElement('div');
-    obstacle.className = 'obstacle';
+    if (obstacleType === 'pipe') {
+        obstacle.className = 'obstacle obstacle-pipe';
+        obstacle.style.width = '70px';
+        obstacle.style.height = '100px';
+        obstacle.style.background = "url('../assets/obstacle_pipe.png') center/contain no-repeat";
+        obstacle.style.bottom = '80px';
+    } else {
+        obstacle.className = 'obstacle';
+        obstacle.style.width = '40px';
+        obstacle.style.height = '60px';
+        obstacle.style.background = "url('../assets/thorny_bush.png') center/contain no-repeat";
+        obstacle.style.bottom = '80px';
+    }
     obstacle.style.left = '800px';
-    obstacle.style.bottom = '80px';
     gameContainer.appendChild(obstacle);
 }
 
@@ -179,13 +210,11 @@ function generateCollectible() {
 }
 
 function startGeneratingObjects() {
-    setTimeout(generateObstacle, Math.random() * 2000 + 1000);
-    setTimeout(generateCollectible, Math.random() * 1500 + 500);
+    // Start the obstacle scheduling loop
+    lastObstacleTime = Date.now() - minObstacleInterval; // Allow immediate first spawn
+    scheduleNextObstacle();
 
-    obstacleInterval = setInterval(() => {
-        if (gameRunning) generateObstacle();
-    }, 2000 / gameSpeed);
-
+    // Collectibles can use a regular interval or similar random scheduling
     collectibleInterval = setInterval(() => {
         if (gameRunning) generateCollectible();
     }, 1500 / gameSpeed);
@@ -196,7 +225,7 @@ function startGeneratingObjects() {
 function gameLoop() {
     if (!gameRunning) return;
 
-    // Only apply gravity if not jumping and above ground
+    // Gravity
     if (!isJumping && playerBottom > 80) {
         playerBottom -= gravity * 8;
         if (playerBottom < 80) playerBottom = 80;
@@ -226,11 +255,11 @@ function gameLoop() {
             collectible.remove();
             score++;
             scoreDisplay.textContent = 'Score: ' + score;
-            if (score % 5 === 0) {
-                gameSpeed += 0.1;
-                clearInterval(obstacleInterval);
-                clearInterval(collectibleInterval);
-                startGeneratingObjects();
+
+            // Increase speed every 10 points
+            if (score % 10 === 0 && score !== 0 && score !== lastSpeedIncreaseScore) {
+                gameSpeed += 1.5;
+                lastSpeedIncreaseScore = score;
             }
         }
 

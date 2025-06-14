@@ -1,10 +1,44 @@
+/* =========================
+   CSS Variables & Resets
+   ========================= */
+:root {
+    --main-blue: #2e86de;
+    --main-yellow: #ffcc00;
+    --main-brown: #a0522d;
+    --main-bg: #f0f8ff;
+    --ground-height: 80px;
+    --player-width: 70px;
+    --player-height: 100px;
+    --obstacle-width: 40px;
+    --obstacle-height: 60px;
+    --obstacle-bush-width: 30px;
+    --obstacle-bush-height: 50px;
+    --obstacle-pipe-width: 50px;
+    --obstacle-pipe-height: 80px;
+    --collectible-size: 40px;
+    --popup-bg: #fff;
+    --popup-radius: 12px;
+    --popup-shadow: 0 0 24px rgba(0,0,0,0.2);
+    --popup-font: 'Segoe UI', 'Roboto', 'Arial Rounded MT Bold', Arial, sans-serif;
+    --popup-title-font: 'Baloo 2', 'Segoe UI', 'Arial Rounded MT Bold', Arial, sans-serif;
+    --popup-title-color: var(--main-blue);
+    --popup-link: var(--main-yellow);
+    --score-bg: rgba(255,255,255,0.8);
+    --score-color: #333;
+    --score-radius: 5px;
+    --score-shadow: none;
+    --overlay-bg: rgba(0,0,0,0.7);
+    --overlay-z: 1000;
+}
+
+/* Reset & Base Styles */
 html, body {
     margin: 0;
     padding: 0;
     height: 100%;
     width: 100%;
-    font-family: 'Baloo 2', cursive;
-    background: #f0f8ff;
+    font-family: var(--popup-font);
+    background: var(--main-bg);
 }
 
 body {
@@ -14,10 +48,13 @@ body {
     min-height: 100vh;
 }
 
+/* =========================
+   Game Container & Ground
+   ========================= */
 #game-container {
     width: 800px;
     height: 400px;
-    border: 5px solid #2e86de;
+    border: 5px solid var(--main-blue);
     overflow: hidden;
     position: relative;
     background: linear-gradient(to bottom, #87ceeb, #a9e2f9);
@@ -25,116 +62,145 @@ body {
     box-shadow: 0 4px 24px rgba(46,134,222,0.15);
 }
 
-@keyframes background-scroll {
-    from { background-position-x: 0; }
-    to { background-position-x: -800px; } /* Scroll by container width */
+#ground {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: var(--ground-height);
+    background: url('../assets/ground_texture.png') repeat-x center/cover;
+    z-index: 1;
+    pointer-events: none;
 }
 
+/* =========================
+   Player, Obstacles, Collectibles
+   ========================= */
 #player {
     position: absolute;
-    width: 50px;
-    height: 70px;
-    bottom: 80px;
+    width: var(--player-width);
+    height: var(--player-height);
+    bottom: 30px;
     left: 50px;
-    border-radius: 10px 10px 20px 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     transition: bottom 0.2s cubic-bezier(.4,2,.6,1);
     outline: none;
-    background: url('../assets/player_sprite.png') center/contain no-repeat, #ffcc00;
+    background: url('../assets/player_sprite.png') center/contain no-repeat;
+    z-index: 2;
 }
 
-/* For jump animation - JS will toggle a class */
-.jump {
-    bottom: 150px !important;
-}
-
-.obstacle, .collectible {
+.obstacle,
+.obstacle.obstacle-pipe {
     position: absolute;
-    bottom: 80px;
-    left: 800px;
-    will-change: left;
+    left: 800px; /* Ensure obstacles start off-screen to the right */
+    bottom: var(--ground-height); /* Align with the ground */
+    z-index: 2;
+    /* width, height, and background are set via variables or inline styles */
+    margin: 0; /* Remove any default margin */
+    padding: 0; /* Remove any default padding */
+    box-sizing: border-box;
 }
 
 .obstacle {
-    width: 40px;
-    height: 60px;
-    background: url('../assets/thorny_bush.png') center/contain no-repeat, #a0522d;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(160,82,45,0.2);
+    width: var(--obstacle-bush-width);
+    height: var(--obstacle-bush-height);
+    background: url('../assets/thorny_bush.png') center/contain no-repeat;
+}
+
+.obstacle.obstacle-pipe {
+    width: var(--obstacle-pipe-width);
+    height: var(--obstacle-pipe-height);
+    background: url('../assets/obstacle_pipe.png') center/contain no-repeat;
 }
 
 .collectible {
-    width: 30px;
-    height: 30px;
-    background: url('../assets/water_drop.png') center/contain no-repeat, #2e86de;
-    border-radius: 50%;
-    box-shadow: 0 2px 8px rgba(46,134,222,0.2);
+    width: var(--collectible-size);
+    height: var(--collectible-size);
+    position: absolute;
+    left: 800px;
+    background: url('../assets/water_drop.png') center/contain no-repeat;
+    z-index: 2;
 }
 
+/* =========================
+   Score Display
+   ========================= */
 #score {
     position: absolute;
     top: 10px;
     left: 10px;
-    color: #333;
+    color: var(--score-color);
     font-size: 1.2em;
     font-weight: bold;
-    background: rgba(255,255,255,0.8);
+    background: var(--score-bg);
     padding: 5px 12px;
-    border-radius: 5px;
+    border-radius: var(--score-radius);
     z-index: 10;
     user-select: none;
+    box-shadow: var(--score-shadow);
 }
 
-/* Overlays for start/game over screens */
+/* =========================
+   Popups & Overlays
+   ========================= */
 .hidden {
     display: none !important;
 }
 
 #message-overlay, #game-over-overlay {
-    position: fixed; /* Changed from absolute to fixed */
+    position: fixed;
     top: 0; left: 0;
-    width: 100vw; height: 100vh; /* Ensure full viewport coverage */
-    background: rgba(0,0,0,0.7);
+    width: 100vw; height: 100vh;
+    background: var(--overlay-bg);
     color: #222;
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000; /* Increased z-index for visibility */
+    z-index: var(--overlay-z);
     pointer-events: all;
 }
 
 #message-content, #game-over-content {
-    background: #fff;
+    background: var(--popup-bg);
     padding: 32px 24px;
-    border-radius: 12px;
-    box-shadow: 0 0 24px rgba(0,0,0,0.2);
+    border-radius: var(--popup-radius);
+    box-shadow: var(--popup-shadow);
     color: #333;
     max-width: 350px;
-    font-family: 'Segoe UI', 'Roboto', 'Arial Rounded MT Bold', Arial, sans-serif;
+    font-family: var(--popup-font);
     letter-spacing: 0.02em;
-    text-align: center; /* Center the content */
+    text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
 #message-content h2, #game-over-content h2 {
-    color: #2e86de;
+    color: var(--popup-title-color);
     margin-bottom: 12px;
+    font-size: 2em;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    font-family: var(--popup-title-font);
+    text-shadow: 0 2px 8px #a9e2f9;
 }
 
 #message-content p, #game-over-content p {
     margin-bottom: 18px;
+    font-size: 1.15em;
+    line-height: 1.6;
+    color: #444;
+    font-family: var(--popup-font);
 }
 
 #game-over-content a {
-    color: #ffcc00;
+    color: var(--popup-link);
     text-decoration: underline;
     font-weight: bold;
+    font-family: inherit;
 }
 
 #start-button, #restart-button {
-    background: #2e86de;
+    background: var(--main-blue);
     color: #fff;
     border: none;
     padding: 10px 24px;
@@ -142,28 +208,16 @@ body {
     cursor: pointer;
     border-radius: 5px;
     transition: background 0.2s;
+    margin-top: 10px;
 }
 
 #start-button:hover, #restart-button:hover {
     background: #1a5b9b;
 }
 
-#ground {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    height: 80px;
-    background: url('../assets/ground_texture.png') repeat-x center/cover;
-    z-index: 1;
-    pointer-events: none;
-}
-
-/* Ensure player and obstacles are above the ground */
-#player, .obstacle, .collectible {
-    z-index: 2;
-}
-
+/* =========================
+   Responsive Design
+   ========================= */
 @media (max-width: 900px) {
     #game-container {
         width: 98vw;
