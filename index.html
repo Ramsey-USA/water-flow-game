@@ -8,8 +8,6 @@
 </head>
 <body>
     <div id="game-container">
-        <div id="ground"></div>
-        <div id="player" tabindex="0" aria-label="Player"></div>
         <div id="header-bar">
             <span id="header-title">Water Runner</span>
             <button id="pause-btn" type="button" aria-label="Pause/Resume Game">Pause</button>
@@ -17,6 +15,11 @@
         <div id="score-bar-container">
             <div id="score-bar"></div>
             <span id="score-label">0 / 50</span>
+        </div>
+        <div id="game-play-area">
+            <div id="ground"></div>
+            <div id="player" tabindex="0" aria-label="Player"></div>
+            <!-- obstacles and collectibles will be dynamically added here -->
         </div>
         <div id="message-overlay" class="hidden">
             <div id="message-content">
