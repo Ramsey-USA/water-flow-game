@@ -67,6 +67,9 @@ body {
     background: linear-gradient(to bottom, #87ceeb, #a9e2f9);
     background-size: cover;
     box-shadow: 0 4px 24px rgba(46,134,222,0.15);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
 }
 
 #ground {
@@ -119,31 +122,75 @@ body {
     background: url('../assets/obstacle_pipe.png') center/contain no-repeat;
 }
 
+.obstacle.obstacle-seagull {
+    width: 70px;
+    height: 48px;
+    background: url('../assets/obstacle_seagull.png') center/contain no-repeat;
+    position: absolute;
+    left: 800px;
+    z-index: 2;
+    /* bottom is set inline in JS for vertical placement */
+}
+
 .collectible {
-    width: var(--collectible-size);
-    height: var(--collectible-size);
+    width: 30px;
+    height: 30px;
     position: absolute;
     left: 800px;
     background: url('../assets/water_drop.png') center/contain no-repeat;
     z-index: 2;
 }
 
+.collectible.collectible-barrel {
+    width: 38px;
+    height: 38px;
+    background: url('../assets/water_barrel.png') center/contain no-repeat;
+    bottom: var(--ground-height);
+}
+
 /* =========================
    Score Display
    ========================= */
-#score {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    color: var(--score-color);
-    font-size: 1.2em;
-    font-weight: bold;
-    background: var(--score-bg);
-    padding: 5px 12px;
-    border-radius: var(--score-radius);
+#score-bar-container {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    height: 28px;
+    margin: 0 auto 16px auto;
+    background: #eaf6fb;
+    border: 2px solid var(--main-blue);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
     z-index: 10;
-    user-select: none;
-    box-shadow: var(--score-shadow);
+    box-shadow: 0 2px 8px rgba(46,157,247,0.08);
+    overflow: hidden;
+    /* Place below the header */
+    top: 0;
+}
+
+#score-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--main-blue), var(--accent-teal));
+    width: 0%;
+    border-radius: 16px 0 0 16px;
+    transition: width 0.3s cubic-bezier(.4,2,.6,1);
+}
+
+#score-label {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    color: var(--main-black);
+    font-weight: bold;
+    font-size: 1.1em;
+    pointer-events: none;
+    letter-spacing: 0.05em;
+}
+
+/* Hide old score display */
+#score {
+    display: none;
 }
 
 /* =========================
@@ -193,10 +240,11 @@ body {
 
 #message-content p, #game-over-content p {
     margin-bottom: 18px;
-    font-size: 1.15em;
+    font-size: 1.25em;
     line-height: 1.6;
-    color: #444;
+    color: var(--main-blue);
     font-family: var(--popup-font);
+    font-weight: bold;
 }
 
 #game-over-content a {
@@ -220,6 +268,75 @@ body {
 
 #start-button:hover, #restart-button:hover {
     background: #1a5b9b;
+}
+
+/* =========================
+   Header Bar
+   ========================= */
+#header-bar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 56px;
+    background: #eaf6fb;
+    border-radius: 0 0 18px 18px;
+    box-shadow: 0 2px 8px rgba(46,157,247,0.08);
+    padding: 16px 32px; /* Increased vertical and horizontal padding */
+    position: relative;
+    z-index: 20;
+    box-sizing: border-box;
+}
+
+#score-bar-container {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    height: 28px;
+    margin: 0 auto 16px auto;
+    background: #eaf6fb;
+    border: 2px solid var(--main-blue);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(46,157,247,0.08);
+    overflow: hidden;
+    /* Place below the header */
+    top: 0;
+}
+
+#header-title {
+    font-family: var(--popup-title-font, 'Segoe UI', Arial, sans-serif);
+    font-size: 2em;
+    font-weight: bold;
+    color: var(--main-blue);
+    letter-spacing: 0.04em;
+    text-shadow: 0 2px 8px #a9e2f9;
+    white-space: nowrap;
+}
+
+/* =========================
+   Pause Button
+   ========================= */
+#pause-btn {
+    margin-left: 24px;
+    background: var(--main-yellow);
+    color: var(--main-black);
+    border: none;
+    padding: 10px 24px;
+    font-size: 1.1em;
+    font-family: var(--popup-title-font, 'Segoe UI', Arial, sans-serif);
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+    box-shadow: 0 2px 8px rgba(46,157,247,0.08);
+}
+
+#pause-btn:hover {
+    background: var(--main-blue);
+    color: #fff;
 }
 
 /* =========================

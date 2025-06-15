@@ -10,7 +10,14 @@
     <div id="game-container">
         <div id="ground"></div>
         <div id="player" tabindex="0" aria-label="Player"></div>
-        <div id="score">Score: 0</div>
+        <div id="header-bar">
+            <span id="header-title">Water Runner</span>
+            <button id="pause-btn" type="button" aria-label="Pause/Resume Game">Pause</button>
+        </div>
+        <div id="score-bar-container">
+            <div id="score-bar"></div>
+            <span id="score-label">0 / 50</span>
+        </div>
         <div id="message-overlay" class="hidden">
             <div id="message-content">
                 <h2>Journey for Every Drop</h2>
@@ -21,7 +28,9 @@
         <div id="game-over-overlay" class="hidden">
             <div id="game-over-content">
                 <h2>Game Over!</h2>
-                <p>You delivered <span id="final-score">0</span> drops of clean water!</p>
+                <p>
+                    You delivered <span id="final-score">0</span> drops of clean water!
+                </p>
                 <p>Every drop makes a difference. Learn more about <a href="https://www.charitywater.org" target="_blank" rel="noopener">charity: water's mission</a>.</p>
                 <button id="restart-button">Play Again</button>
             </div>

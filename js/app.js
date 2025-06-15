@@ -1,20 +1,24 @@
 // Game Elements
 const gameContainer = document.getElementById('game-container');
 const player = document.getElementById('player');
-const scoreDisplay = document.getElementById('score');
+const scoreBar = document.getElementById('score-bar');
+const scoreLabel = document.getElementById('score-label');
 const messageOverlay = document.getElementById('message-overlay');
 const startButton = document.getElementById('start-button');
 const gameOverOverlay = document.getElementById('game-over-overlay');
 const finalScoreDisplay = document.getElementById('final-score');
 const restartButton = document.getElementById('restart-button');
+const pauseBtn = document.getElementById('pause-btn');
+const WIN_SCORE = 50;
 
 // Game Variables
 let gameRunning = false;
 let score = 0;
+let lastSpeedIncreaseScore = 0;
+let gameSpeed = 3;
 let playerBottom = 80;
 let playerLeft = 50;
 let isJumping = false;
-let gameSpeed = 3; // initial speed
 let obstacleInterval;
 let collectibleInterval;
 let gameLoopId;
@@ -25,9 +29,9 @@ let jumpStart = false;
 let jumpPeak = 200; // max jump height
 let jumpSpeed = 5;  // how fast to rise
 let lastObstacleTime = 0;
-let lastSpeedIncreaseScore = 0; // Track last score at which speed increased
 const minObstacleInterval = 900;   // Minimum ms between obstacles
 const maxObstacleInterval = 1600;  // Maximum ms between obstacles
+let paused = false;
 
 // --- Game Initialization and Control ---
 
@@ -41,12 +45,13 @@ restartButton.addEventListener('click', startGame);
 
 function startGame() {
     score = 0;
-    scoreDisplay.textContent = 'Score: 0';
+    lastSpeedIncreaseScore = 0;
+    gameSpeed = 3;
+    updateScoreBar();
     playerBottom = 80;
     player.style.bottom = playerBottom + 'px';
     isJumping = false;
     player.classList.remove('jump');
-    gameSpeed = 3;
 
     // Remove obstacles/collectibles
     document.querySelectorAll('.obstacle, .collectible').forEach(el => el.remove());
@@ -118,7 +123,13 @@ function startJump() {
     jumpLoop();
 }
 
-function endGame() {
+function updateScoreBar() {
+    const percent = Math.min((score / WIN_SCORE) * 100, 100);
+    scoreBar.style.width = percent + '%';
+    scoreLabel.textContent = `${score} / ${WIN_SCORE}`;
+}
+
+function endGame(won = false) {
     gameRunning = false;
     cancelAnimationFrame(gameLoopId);
     clearInterval(obstacleInterval);
@@ -126,6 +137,16 @@ function endGame() {
 
     finalScoreDisplay.textContent = score;
     gameOverOverlay.classList.remove('hidden');
+    const gameOverContent = document.getElementById('game-over-content');
+    if (won) {
+        gameOverContent.querySelector('h2').textContent = "You Win!";
+        gameOverContent.querySelector('p').innerHTML =
+            `You delivered <span id="final-score">${score}</span> drops of clean water!<br>Thank you for making a difference!`;
+    } else {
+        gameOverContent.querySelector('h2').textContent = "Game Over!";
+        gameOverContent.querySelector('p').innerHTML =
+            `You delivered <span id="final-score">${score}</span> drops of clean water!`;
+    }
 }
 
 // --- Player Movement ---
@@ -176,36 +197,68 @@ function scheduleNextObstacle() {
 
 function generateObstacle() {
     if (!gameRunning) return;
-    const now = Date.now();
-    if (now - lastObstacleTime < minObstacleInterval) return;
-    lastObstacleTime = now;
-
-    // Randomly choose obstacle type: bush or pipe
-    const obstacleType = Math.random() < 0.7 ? 'bush' : 'pipe'; // 70% bush, 30% pipe
-    const obstacle = document.createElement('div');
-    if (obstacleType === 'pipe') {
-        obstacle.className = 'obstacle obstacle-pipe';
-        obstacle.style.width = '70px';
-        obstacle.style.height = '100px';
-        obstacle.style.background = "url('../assets/obstacle_pipe.png') center/contain no-repeat";
-        obstacle.style.bottom = '80px';
-    } else {
+    // Randomly pick obstacle type
+    const rand = Math.random();
+    let obstacle;
+    if (rand < 0.33) {
+        // Thorny bush
+        obstacle = document.createElement('div');
         obstacle.className = 'obstacle';
+        obstacle.dataset.type = 'bush';
         obstacle.style.width = '40px';
         obstacle.style.height = '60px';
         obstacle.style.background = "url('../assets/thorny_bush.png') center/contain no-repeat";
+        obstacle.style.left = '800px';
         obstacle.style.bottom = '80px';
+    } else if (rand < 0.66) {
+        // Pipe
+        obstacle = document.createElement('div');
+        obstacle.className = 'obstacle obstacle-pipe';
+        obstacle.dataset.type = 'pipe';
+        obstacle.style.width = '70px';
+        obstacle.style.height = '100px';
+        obstacle.style.background = "url('../assets/obstacle_pipe.png') center/contain no-repeat";
+        obstacle.style.left = '800px';
+        obstacle.style.bottom = '80px';
+    } else {
+        // Seagull
+        obstacle = document.createElement('div');
+        obstacle.className = 'obstacle obstacle-seagull';
+        obstacle.dataset.type = 'seagull';
+        obstacle.style.width = '70px';
+        obstacle.style.height = '48px';
+        obstacle.style.background = "url('../assets/obstacle_seagull.png') center/contain no-repeat";
+        obstacle.style.left = '800px';
+        obstacle.style.bottom = '180px';
     }
-    obstacle.style.left = '800px';
     gameContainer.appendChild(obstacle);
+}
+
+// Call this at game start and on interval
+function startGeneratingObstacles() {
+    generateObstacle();
+    obstacleInterval = setInterval(generateObstacle, 1500);
 }
 
 function generateCollectible() {
     if (!gameRunning) return;
+    const collectibleType = Math.random() < 0.8 ? 'droplet' : 'barrel'; // 80% droplet, 20% barrel
     const collectible = document.createElement('div');
-    collectible.className = 'collectible';
-    collectible.style.left = '800px';
-    collectible.style.bottom = `${Math.random() * 100 + 100}px`;
+    if (collectibleType === 'barrel') {
+        collectible.className = 'collectible collectible-barrel';
+        collectible.style.width = '38px';
+        collectible.style.height = '38px';
+        collectible.style.background = "url('../assets/water_barrel.png') center/contain no-repeat";
+        collectible.style.left = '800px';
+        collectible.style.bottom = '80px'; // rolls on the ground
+    } else {
+        collectible.className = 'collectible';
+        collectible.style.width = '30px';
+        collectible.style.height = '30px';
+        collectible.style.background = "url('../assets/water_drop.png') center/contain no-repeat";
+        collectible.style.left = '800px';
+        collectible.style.bottom = `${Math.random() * 100 + 100}px`; // appears in the air
+    }
     gameContainer.appendChild(collectible);
 }
 
@@ -223,7 +276,7 @@ function startGeneratingObjects() {
 // --- Game Loop (Main Update Function) ---
 
 function gameLoop() {
-    if (!gameRunning) return;
+    if (!gameRunning || paused) return;
 
     // Gravity
     if (!isJumping && playerBottom > 80) {
@@ -239,10 +292,18 @@ function gameLoop() {
 
         // Collision detection
         if (isColliding(player, obstacle)) {
-            endGame();
+            if (obstacle.dataset.type === 'seagull') {
+                score = Math.max(0, score - 3);
+            } else if (obstacle.dataset.type === 'pipe') {
+                score = Math.max(0, score - 2);
+            } else {
+                score = Math.max(0, score - 2);
+            }
+            updateScoreBar();
+            obstacle.remove();
         }
 
-        if (currentLeft < -obstacle.offsetWidth) {
+        if (currentLeft < -100) {
             obstacle.remove();
         }
     });
@@ -253,13 +314,22 @@ function gameLoop() {
 
         if (isColliding(player, collectible)) {
             collectible.remove();
-            score++;
-            scoreDisplay.textContent = 'Score: ' + score;
+            if (collectible.classList.contains('collectible-barrel')) {
+                score += 5; // Water barrel adds 5 points
+            } else {
+                score++; // Regular droplet adds 1 point
+            }
+            updateScoreBar();
 
             // Increase speed every 10 points
             if (score % 10 === 0 && score !== 0 && score !== lastSpeedIncreaseScore) {
                 gameSpeed += 1.5;
                 lastSpeedIncreaseScore = score;
+            }
+
+            // Win condition
+            if (score >= WIN_SCORE) {
+                endGame(true); // Pass true to indicate a win
             }
         }
 
@@ -283,3 +353,12 @@ function isColliding(a, b) {
         aRect.top > bRect.bottom
     );
 }
+
+pauseBtn.addEventListener('click', () => {
+    if (!gameRunning) return;
+    paused = !paused;
+    pauseBtn.textContent = paused ? 'Resume' : 'Pause';
+    if (!paused) {
+        gameLoopId = requestAnimationFrame(gameLoop);
+    }
+});
