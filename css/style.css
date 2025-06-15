@@ -2,20 +2,27 @@
    CSS Variables & Resets
    ========================= */
 :root {
-    --main-blue: #2e86de;
-    --main-yellow: #ffcc00;
-    --main-brown: #a0522d;
-    --main-bg: #f0f8ff;
+    /* Primary Colors */
+    --main-blue: #2E9DF7;
+    --main-yellow: #FFC907;
+    --main-black: #231F20;
+
+    /* Secondary/Accent Colors */
+    --accent-teal: #8BD1CB;
+    --accent-green: #4FCB53;
+    --accent-orange: #FF902A;
+    --accent-red: #F5402C;
+
+    /* Other Variables */
+    --main-bg: #eaf6fb;
     --ground-height: 80px;
-    --player-width: 70px;
-    --player-height: 100px;
-    --obstacle-width: 40px;
-    --obstacle-height: 60px;
-    --obstacle-bush-width: 30px;
-    --obstacle-bush-height: 50px;
-    --obstacle-pipe-width: 50px;
-    --obstacle-pipe-height: 80px;
-    --collectible-size: 40px;
+    --player-width: 50px;
+    --player-height: 70px;
+    --obstacle-bush-width: 40px;
+    --obstacle-bush-height: 60px;
+    --obstacle-pipe-width: 70px;
+    --obstacle-pipe-height: 100px;
+    --collectible-size: 30px;
     --popup-bg: #fff;
     --popup-radius: 12px;
     --popup-shadow: 0 0 24px rgba(0,0,0,0.2);
@@ -24,10 +31,10 @@
     --popup-title-color: var(--main-blue);
     --popup-link: var(--main-yellow);
     --score-bg: rgba(255,255,255,0.8);
-    --score-color: #333;
+    --score-color: var(--main-black);
     --score-radius: 5px;
     --score-shadow: none;
-    --overlay-bg: rgba(0,0,0,0.7);
+    --overlay-bg: rgba(35,31,32,0.7);
     --overlay-z: 1000;
 }
 
